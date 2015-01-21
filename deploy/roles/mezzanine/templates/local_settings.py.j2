@@ -1,0 +1,54 @@
+from __future__ import unicode_literals
+
+SECRET_KEY = "{{ secret_key }}"
+NEVERCACHE_KEY = "{{ nevercache_key }}"
+
+# {{ web_domains }}
+ALLOWED_HOSTS = [
+            {% for domain in web_domains %} "{{ domain }}",
+            {% endfor %}]
+
+DATABASES = {
+    "default": {
+        # Ends with "postgresql_psycopg2", "mysql", "sqlite3" or "oracle".
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        # DB name or path to database file if using sqlite3.
+        "NAME": "{{ DB_name }}",
+        # Not used with sqlite3.
+        "USER": "{{ DB_user }}",
+        # Not used with sqlite3.
+        "PASSWORD": "{{ DB_password }}",
+        # Set to empty string for localhost. Not used with sqlite3.
+        "HOST": "{{groups['dbservers'][0]}}",
+        # Set to empty string for default. Not used with sqlite3.
+        "PORT": "{{ DB_port }}",
+    }
+}
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
+
+CACHE_MIDDLEWARE_SECONDS = 60
+
+CACHE_MIDDLEWARE_KEY_PREFIX = "{{ project_name }}"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "LOCATION": "127.0.0.1:11211",
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+TWITTER_ACCESS_TOKEN_KEY = "{{ twitter_access_token_key }}"
+TWITTER_ACCESS_TOKEN_SECRET = "{{ twitter_access_token_secret }}"
+TWITTER_CONSUMER_KEY = "{{ twitter_consumer_key }}"
+TWITTER_CONSUMER_SECRET = "{{ twitter_consumer_secret }}"
+TWITTER_DEFAULT_NUM_TWEETS = {{ twitter_default_num_tweets }}
+TWITTER_DEFAULT_QUERY = "{{ twitter_default_query }}"
+TWITTER_DEFAULT_QUERY_TYPE = "{{ twitter_default_query_type }}"
+
+SSL_ENABLED = {{ ssl_enabled }}
+
+SITE_TITLE = "{{ site_title }}"
+SITE_TAGLINE = "{{ site_tagline }}"

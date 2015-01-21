@@ -1,0 +1,11 @@
+[group:{{ project_name }}]
+programs=gunicorn_{{ project_name }}-api
+
+[program:gunicorn_{{ project_name }}-api]
+command={{ virtualenv_path }}/bin/gunicorn {{api_project_name}}.wsgi:application -b 127.0.0.1:{{ api_gunicorn_port }}
+directory={{ api_project_path }}
+user={{ install_user }}
+autostart=true
+autorestart=true
+redirect_stderr=true
+environment=LANG="{{ locale }}",LC_ALL="{{ locale }}",LC_LANG="{{ locale }}"

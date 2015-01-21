@@ -1,0 +1,11 @@
+[group:{{ project_name }}]
+programs=gunicorn_{{ project_name }}
+
+[program:gunicorn_{{ project_name }}]
+command={{ virtualenv_path }}/bin/gunicorn_django -c gunicorn.conf.py -p gunicorn.pid
+directory={{ project_path }}
+user={{ install_user }}
+autostart=true
+autorestart=true
+redirect_stderr=true
+environment=LANG="{{ locale }}",LC_ALL="{{ locale }}",LC_LANG="{{ locale }}"

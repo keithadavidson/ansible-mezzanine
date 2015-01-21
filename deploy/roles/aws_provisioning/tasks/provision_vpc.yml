@@ -1,0 +1,61 @@
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Keith Davidson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+- name: create a vpc
+  ec2_vpc:
+    internet_gateway: True
+    resource_tags: { env: "{{pipeline_env}}", Name: "{{pipeline_env}} Environment" }
+    cidr_block: 10.3.0.0/16
+    region: "{{ region }}"
+    state: present
+    subnets:
+      - cidr: 10.3.0.0/24
+        az: "{{ region }}a"
+        resource_tags:
+          env: "{{pipeline_env}}"
+          tier: "{{pipeline_env}}-web"
+      - cidr: 10.3.1.0/24
+        az: "{{ region }}a"
+        resource_tags:
+          env: "{{pipeline_env}}"
+          tier: "{{pipeline_env}}-db"
+      - cidr: 10.3.2.0/24
+        az: "{{ region }}b"
+        resource_tags:
+          env: "{{pipeline_env}}"
+          tier: "{{pipeline_env}}-db"
+    route_tables:
+      - subnets:
+        - 10.3.0.0/24
+        - 10.3.1.0/24
+        routes:
+        - dest: 0.0.0.0/0
+          gw: igw
+  register: vpc
+
+- name: Set facts for VPC
+  set_fact:
+    vpc_id: "{{ vpc.vpc_id }}"
+    public_subnet_id: "{{ vpc.subnets[0].id }}"
+    private_subnet_id: "{{ vpc.subnets[1].id }}"
+    private_subnet_id_a: "{{ vpc.subnets[1].id }}"
+    private_subnet_id_b: "{{ vpc.subnets[2].id }}"

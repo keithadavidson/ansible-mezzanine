@@ -1,0 +1,13 @@
+Django>=1.6.8
+Fabric==1.10.0
+Mezzanine>=3.1.10
+South>=1.0.1
+djangorestframework>=3.0.0
+paramiko==1.15.1
+psycopg2>=2.5.4
+pycrypto==2.6.1
+python-memcached>=1.53
+wsgiref==0.1.2
+django-recaptcha==1.0.2
+gunicorn==19.1.1
+django-cookie-law==1.0.1

@@ -1,0 +1,72 @@
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Keith Davidson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+- name: Install python packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - python-setuptools
+    - python-dev
+    - python-software-properties
+    - libpq-dev
+    - python-pip
+  tags: api
+
+- name: Add WORKON_HOME=$HOME/.virtualenvs to .bashrc
+  lineinfile: >
+    dest=/home/{{ install_user }}/.bashrc
+    state=present
+    regexp='^export WORKON_HOME\=\$HOME\/\.virtualenvs'
+    line='export WORKON_HOME=$HOME/.virtualenvs'
+    insertafter=EOF
+  tags: api
+
+- name: Add PROJECT_HOME=$HOME/{{ project_name }} to .bashrc
+  lineinfile: >
+    dest=/home/{{ install_user }}/.bashrc
+    state=present
+    regexp='^export PROJECT_HOME\=\$HOME\/{{ project_name }}'
+    line='export PROJECT_HOME=$HOME/{{ project_name }}'
+    insertafter=EOF
+  tags: api
+
+- name: Add source /usr/local/bin/virtualenvwrapper.sh to .bashrc
+  lineinfile: >
+    dest=/home/{{ install_user }}/.bashrc
+    state=present
+    regexp='^source \/usr\/local\/bin\/virtualenvwrapper\.sh'
+    line='source /usr/local/bin/virtualenvwrapper.sh'
+    insertafter=EOF
+  tags: api
+
+- name: Install (Virtualenv & VirtualenvWrapper) python package.
+  pip: name={{ item }}
+  with_items:
+    - virtualenv
+    - virtualenvwrapper
+  tags: api
+
+#- name: Create virtualenv
+#  shell: . /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv {{ api_project_name }} --distribute
+#  args:
+#    executable: /bin/bash
+#  tags: api
+

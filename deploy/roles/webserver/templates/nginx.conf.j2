@@ -1,0 +1,51 @@
+
+upstream {{ project_name }} {
+    server 127.0.0.1:{{ web_gunicorn_port }};
+}
+
+server {
+
+    listen 80;
+    {% if ssl_enabled %} listen 443 ssl; {% endif %}
+    server_name {% for domain in web_domains %}{{ domain }},{% endfor %};
+    client_max_body_size 10M;
+    keepalive_timeout    15;
+    access_log /var/log/nginx/{{ project_name }}/access.log;
+    error_log /var/log/nginx/{{ project_name }}/error.log;
+
+    {% if ssl_enabled %} ssl_certificate      conf/{{ project_name }}.crt; {% endif %}
+    {% if ssl_enabled %} ssl_certificate_key  conf/{{ project_name }}.key; {% endif %}
+    {% if ssl_enabled %} ssl_session_cache    shared:SSL:10m; {% endif %}
+    {% if ssl_enabled %} ssl_session_timeout  10m; {% endif %}
+    {% if ssl_enabled %} ssl_ciphers RC4:HIGH:!aNULL:!MD5; {% endif %}
+    {% if ssl_enabled %} ssl_prefer_server_ciphers on; {% endif %}
+
+    location / {
+        proxy_redirect      off;
+        proxy_set_header    Host                    $host;
+        proxy_set_header    X-Real-IP               $remote_addr;
+        proxy_set_header    X-Forwarded-For         $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Protocol    $scheme;
+        proxy_pass          http://{{ project_name }};
+        access_log          on;
+    }
+
+    location /static/ {
+        root            {{ mezzanine_project_path }};
+        access_log      off;
+        log_not_found   off;
+    }
+
+    location /robots.txt {
+        root            {{ mezzanine_project_path }}/static;
+        access_log      off;
+        log_not_found   off;
+    }
+
+    location /favicon.ico {
+        root            {{ mezzanine_project_path }}/static/img;
+        access_log      off;
+        log_not_found   off;
+    }
+
+}

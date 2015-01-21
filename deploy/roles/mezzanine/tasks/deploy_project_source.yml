@@ -1,0 +1,78 @@
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Keith Davidson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+- name: Deploy from project repo
+  sudo_user: "{{ install_user }}"
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ project_path }}"
+    version: "{{ git_branch }}"
+    accept_hostkey: yes
+    ssh_opts: "-o ForwardAgent"
+  when: git_repo is defined
+  tags:
+    - app
+    - deploy
+
+
+# if deploying from a local repo then don't use the git module as it requires a url.
+- name: Check if "{{ project_path }}" exists
+  sudo_user: "{{ install_user }}"
+  stat: path={{ project_path }}
+  register: check_path
+  tags:
+    - app
+    - deploy
+
+- name: Deploy from local repo
+  sudo_user: "{{ install_user }}"
+  when: git_repo_local is defined and check_path.stat.exists
+  shell: git pull chdir="{{ project_path }}"
+  tags:
+    - app
+    - deploy
+
+- name: Initial clone from local repo
+  sudo_user: "{{ install_user }}"
+  when: check_path.stat.exists == false and git_repo_local is defined
+  shell: git clone --no-hardlinks -l {{ git_repo_local }} {{ project_path }}
+  args:
+    chdir: "{{ project_base }}"
+  tags:
+    - app
+    - deploy
+
+- name: Check if environment requirements file exists
+  sudo_user: "{{ install_user }}"
+  stat: path={{ mezzanine_project_path }}/requirements/{{ pipeline_env }}.txt
+  register: check_path
+  tags:
+    - app
+    - deploy
+
+- name: Install project python package.
+  sudo_user: "{{ install_user }}"
+  pip: requirements={{ mezzanine_project_path }}/requirements/{{ pipeline_env }}.txt virtualenv={{ virtualenv_path }}
+  when: check_path.stat.exists
+  tags:
+    - app
+    - deploy

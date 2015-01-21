@@ -1,0 +1,53 @@
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Keith Davidson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Variables used generally
+
+# Default install user (so it is not vagrant and emulates production)
+install_user: ubuntu
+
+# Project variables
+project_name: ansible_mezzanine
+
+# Deployed directories
+project_base: "/home/{{ install_user }}"
+project_path: "{{ project_base }}/{{ project_name }}"
+mezzanine_project_path: "{{ project_path }}/someproject"
+api_project_name: someapiproject
+api_project_path: "{{ project_path }}/{{ api_project_name }}"
+api_project_settings_path: "{{ api_project_path }}/someapiproject"
+
+# Virtualenv variables
+virtualenv_home: "/home/{{ install_user }}/.virtualenvs"
+virtualenv_path: "{{ virtualenv_home}}/{{ project_name }}"
+
+# Project Locale
+locale: en_US.UTF-8
+
+# local directories
+project_deploy_directory: ~/projects/ansible_mezzanine
+project_source_directory: ~/Dropbox/Projects/ansible_mezzanine
+project_ansible_directory: "{{project_source_directory}}/deploy"
+
+# Nginx variables
+ssl_enabled: True
+nginx_conf_path: /etc/nginx/conf

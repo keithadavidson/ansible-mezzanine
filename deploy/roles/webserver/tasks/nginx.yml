@@ -1,0 +1,94 @@
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Keith Davidson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+- name: copy nginx config file
+  template:
+    src: nginx.conf.j2
+    dest: "/etc/nginx/sites-available/{{ project_name }}.conf"
+  notify:
+    - restart nginx
+  tags: app
+
+- name: create nginx site log directory
+  file:
+    dest: "/var/log/nginx/{{ project_name }}"
+    state: directory
+  notify:
+    - restart nginx
+  tags: app
+
+- name: remove nginx default site from sites_enabled
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+  notify:
+    - restart nginx
+  tags: app
+
+
+- name: enable configuration
+  file:
+    dest: "/etc/nginx/sites-enabled/{{ project_name }}.conf"
+    src: "/etc/nginx/sites-available/{{ project_name }}.conf"
+    state: link
+  notify:
+    - restart nginx
+  tags: app
+
+# Setup SSL certificates
+- name: ensure config path exists
+  file:
+    path: "{{ nginx_conf_path }}"
+    state: directory
+  when: ssl_enabled
+  tags: app
+
+- name: create ssl certificates
+  command: >
+    openssl req -new -x509 -nodes -out {{ project_name }}.crt
+    -keyout {{ project_name }}.key -subj '/CN={{ web_domains[0] }}' -days 3650
+    chdir={{ nginx_conf_path }}
+    creates={{ nginx_conf_path }}/{{ project_name }}.crt
+  sudo: True
+  when: ssl_enabled and pipeline_env!="prod"
+  notify: restart nginx
+  tags: app
+
+- name: copy ssl key
+  copy:
+    src: "certs/{{project_name}}.key"
+    dest: "{{ nginx_conf_path }}/ssl/{{ project_name }}.key"
+    owner: root
+    mode: 0600
+  sudo: True
+  when: ssl_enabled and pipeline_env=="prod"
+  notify: restart nginx
+  tags: app
+
+- name: copy ssl certificate
+  copy:
+    src: "certs/{{project_name}}.crt"
+    dest: "{{ nginx_conf_path }}/ssl/{{ project_name }}.crt"
+  sudo: True
+  when: ssl_enabled and pipeline_env=="prod"
+  notify: restart nginx
+  tags: app
