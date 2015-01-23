@@ -121,3 +121,8 @@ Staging environment, deploy the Mezzanine application:
     
     
     
+# TODOs:
+
+- integration with CI to spin-up Jenkins (slaves) for automated test runs.
+
+    
