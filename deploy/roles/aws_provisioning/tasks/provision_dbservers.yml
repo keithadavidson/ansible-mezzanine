@@ -31,11 +31,13 @@
       - "{{ private_subnet_id_a }}"
       - "{{ private_subnet_id_b }}"
   register: DB_group
-  tags: postgres
+  tags:
+    - provision
 
 - name: show db_group facts
   debug: msg="{{db_sec_group}}"
-  tags: postgres
+  tags:
+    - provision
 # RDS db setup
 - name: provision RDS primary instance
   rds:
@@ -53,8 +55,8 @@
     password: "{{ DB_password }}"
     wait: yes
     wait_timeout: 600
-  tags: postgres
-
+  tags:
+    - provision
 # Create a read-only replica and wait for it to become available
 - name: provision RDS replica instance
   rds:
@@ -65,7 +67,8 @@
     wait: yes
     wait_timeout: 600
   ignore_errors: True
-  tags: postgres
+  tags:
+    - provision
 
 # Get facts about an instance
 - name: gather RDS facts
@@ -75,11 +78,12 @@
     instance_name: "{{ DB_name }}"
   register: rds_facts
   tags:
-    - postgres
+    - provision
 
 - name: show instance facts
   debug: msg="{{ rds_facts }}"
-  tags: postgres
+  tags:
+    - provision
 
 #- name: tag a resource
 #  ec2_tag:

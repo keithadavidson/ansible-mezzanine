@@ -25,12 +25,15 @@
   add_host: name={{ item.public_ip }} groups=webservers,tag_teir_{{ pipeline_env }}-web
   with_items: ec2vpc_web.instances
   when: ec2vpc_web is defined
+  tags:
+    - provision
 
 # add host to group 'dbservers'
 - name: add new instances of dbservers to dbservers group
   add_host: name={{ item.public_ip }} groups=dbservers,{{DB_name}}
   with_items: ec2vpc_db.instances
   when: ec2vpc_db is defined
-
+  tags:
+    - provision
 
 

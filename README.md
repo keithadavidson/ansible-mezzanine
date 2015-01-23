@@ -31,6 +31,14 @@ So here I have tried to use variables in Ansible to parameterize the playbooks b
 I have implemented 3 environments local-dev, staging and production. However others could be easily added such as 
 testing or continuous integration container environments.
 
+### Requirements
+
+- ansible
+- virtualenv
+- vagrant
+- git
+- aws
+
 ### Parameters
 For each environment definition is done in the '/deploy/pipeline/{{ environment }}', for example local using vagrant:
 
@@ -109,13 +117,13 @@ The `--ask-sudo-pass`, will prompt for your local sudo password so that '/etc/ho
     
 For a staging environment:
 
-    ansible-playbook -i ec2.py site.yml --extra-vars='pipeline_env=stage'
+    ansible-playbook -i library/ec2.py site.yml --extra-vars='pipeline_env=stage'
     
 Here the dynamic inventory for AWS is used as stage is provisioned into there.
 
 For a prod environment:
 
-    ansible-playbook -i ec2.py site.yml --extra-vars='pipeline_env=prod'
+    ansible-playbook -i library/ec2.py site.yml --extra-vars='pipeline_env=prod'
     
 Here the dynamic inventory for AWS is used as stage is provisioned into there.
 
@@ -131,7 +139,7 @@ Local vagrant development environment, deploy only the API:
     
 Staging environment, deploy the Mezzanine application:
 
-    ansible-playbook -i ec2.py site.yml --extra-vars='pipeline_env=stage' --tags app
+    ansible-playbook -i library/ec2.py site.yml --extra-vars='pipeline_env=stage' --tags app
     
     
     

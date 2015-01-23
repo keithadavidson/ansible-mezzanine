@@ -51,6 +51,8 @@
         - dest: 0.0.0.0/0
           gw: igw
   register: vpc
+  tags:
+    - provision
 
 - name: Set facts for VPC
   set_fact:
@@ -59,3 +61,5 @@
     private_subnet_id: "{{ vpc.subnets[1].id }}"
     private_subnet_id_a: "{{ vpc.subnets[1].id }}"
     private_subnet_id_b: "{{ vpc.subnets[2].id }}"
+  tags:
+    - provision

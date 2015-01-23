@@ -36,6 +36,8 @@
         to_port: 443
         cidr_ip: 0.0.0.0/0
   register: web_secgroup
+  tags:
+    - provision
 
 - name: db security group
   ec2_group:
@@ -54,6 +56,8 @@
         to_port: 443
         cidr_ip: 0.0.0.0/0
   register: db_sec_group
+  tags:
+    - provision
 
 - name: ssh security group
   ec2_group:
@@ -66,3 +70,5 @@
         from_port: 22
         to_port: 22
         cidr_ip: 0.0.0.0/0
+  tags:
+    - provision

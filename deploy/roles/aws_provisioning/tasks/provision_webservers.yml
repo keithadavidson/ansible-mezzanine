@@ -26,6 +26,8 @@
     release: trusty
     region: "{{ region }}"
   register: ubuntu_image
+  tags:
+    - provision
 
 - name: start the webserver instances
   ec2:
@@ -40,7 +42,11 @@
     vpc_subnet_id: "{{ public_subnet_id }}"
     assign_public_ip: yes
     wait: yes
+  environment:
+    EC2_INI_PATH: "library/ec2.ini"
   register: ec2vpc_web
+  tags:
+    - provision
 
 - name: add the instance to web and environment groups
   add_host:
@@ -48,6 +54,8 @@
     groups: "{{pipeline_env}}-web, {{pipeline_env}}"
   with_items: ec2vpc_web.instances
   when: item.public_dns_name is defined
+  tags:
+    - provision
 
 - name: wait for ssh server to be running
   wait_for:
@@ -56,3 +64,5 @@
     search_regex: OpenSSH
   with_items: ec2vpc_web.instances
   when: item.public_dns_name is defined
+  tags:
+    - provision
