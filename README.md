@@ -4,11 +4,23 @@ Template for a full deployment pipeline (dev, staging, production ) of Mezzanine
 The Ansible playbook defined under "deploy" does the following:
 
 - Provision nodes in Vagrant or AWS
+    - Provisions nodes
+    - Setups DNS (including hosts for local dev)
+    - Provisions VPC and security groups
 - Deploy and configure Mezzanine 
+    - deploys all packages
+    - configures nginx and gunicorn
+    - Updates Mezzanine, local_settings.py and settings.py
+    - Updates DB config to accept connections from web servers
 - Deploy and configure Django
+    - deploys all packages
+    - Updates DB config to accept connections from web servers
+    - configures nginx and gunicorn
 - Deploy a Mezzanine project
+    - deploys code from git repo locally or from remote, based on branch
 - Deploy a Django API project
-
+    - deploys code from git repo locally or from remote, based on branch
+    
 The primary focus of this project was to see how the same playbook(s) could be used for deploying to all environments 
 in a deployment pipeline. One of the core principles in DevOps is that your mechanisms for deployment are automated and 
 repeatable so that they can be tested continuous. To this end using the same mechanism, with minimal change to the 
@@ -84,14 +96,16 @@ are working in a Virtualenv. All of the following commands have been made idempo
 
 #### Create an environment (Provision and Deploy)
 
-    ansible-playbook -i stubinv site.yml --extra-vars='pipeline_env=local'
+    ansible-playbook -i stubinv site.yml --extra-vars='pipeline_env=local' --ask-sudo-pass
     
 Now I do need to start off with an quirk here, the first time you spin up a vagrant environment the inventory is not 
 going to exist so I placed a stub inventory into the project. This will only execute the provision portion.
 On all subsequent executions the linked file 'local' will exists, which links to the generated inventory from the vagrant provision.
 Hence the following command is used to execute the Provision and Deploy, even if you destroy your vagrant nodes:
 
-    ansible-playbook -i local site.yml --extra-vars='pipeline_env=local'
+    ansible-playbook -i local site.yml --extra-vars='pipeline_env=local' --ask-sudo-pass
+    
+The `--ask-sudo-pass`, will prompt for your local sudo password so that '/etc/hosts' can be updated with the node names.
     
 For a staging environment:
 
