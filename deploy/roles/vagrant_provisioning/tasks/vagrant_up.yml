@@ -66,6 +66,6 @@
   sudo: False
   file:
     src: "{{project_deploy_directory}}/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory"
-    dest: "{{project_ansible_directory}}/{{ pipeline_env }}"
+    dest: "{{project_ansible_directory}}/inventory/{{ pipeline_env }}"
     state: link
   tags: provision

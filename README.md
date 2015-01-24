@@ -39,6 +39,17 @@ testing or continuous integration container environments.
 - git
 - aws
 
+### Accessing providers and git
+This template relies on the use of ssh forwarding rather than copying ssh keys to the various nodes, this is much more
+secure in my view.
+
+Ensure you have the ssh-agent running on the workstation you are executing the ansible playbook from and have the 
+following keys loaded (use `ssh-add yourkey'):
+- stage.pem { form your staging key pair on AWS }
+- prod.pem  { from your production key pair on aws }
+- your key used to access your git repository.
+
+
 ### Parameters
 For each environment definition is done in the '/deploy/pipeline/{{ environment }}', for example local using vagrant:
 
@@ -104,26 +115,26 @@ are working in a Virtualenv. All of the following commands have been made idempo
 
 #### Create an environment (Provision and Deploy)
 
-    ansible-playbook -i stubinv site.yml --extra-vars='pipeline_env=local' --ask-sudo-pass
+    ansible-playbook -i inventory/stubinv site.yml --extra-vars='pipeline_env=local' --ask-sudo-pass
     
 Now I do need to start off with an quirk here, the first time you spin up a vagrant environment the inventory is not 
 going to exist so I placed a stub inventory into the project. This will only execute the provision portion.
 On all subsequent executions the linked file 'local' will exists, which links to the generated inventory from the vagrant provision.
 Hence the following command is used to execute the Provision and Deploy, even if you destroy your vagrant nodes:
 
-    ansible-playbook -i local site.yml --extra-vars='pipeline_env=local' --ask-sudo-pass
+    ansible-playbook -i inventory/local site.yml --extra-vars='pipeline_env=local' --ask-sudo-pass
     
 The `--ask-sudo-pass`, will prompt for your local sudo password so that '/etc/hosts' can be updated with the node names.
     
 For a staging environment:
 
-    ansible-playbook -i library/ec2.py site.yml --extra-vars='pipeline_env=stage'
+    ansible-playbook -i inventory/ec2.py site.yml --extra-vars='pipeline_env=stage'
     
 Here the dynamic inventory for AWS is used as stage is provisioned into there.
 
 For a prod environment:
 
-    ansible-playbook -i library/ec2.py site.yml --extra-vars='pipeline_env=prod'
+    ansible-playbook -i inventory/ec2.py site.yml --extra-vars='pipeline_env=prod'
     
 Here the dynamic inventory for AWS is used as stage is provisioned into there.
 
@@ -135,16 +146,16 @@ Here the dynamic inventory for AWS is used as stage is provisioned into there.
 
 Local vagrant development environment, deploy only the API:
 
-    ansible-playbook -i local site.yml --extra-vars='pipeline_env=local' --tags api
+    ansible-playbook -i inventory/local site.yml --extra-vars='pipeline_env=local' --tags api
     
 Staging environment, deploy the Mezzanine application:
 
-    ansible-playbook -i library/ec2.py site.yml --extra-vars='pipeline_env=stage' --tags app
+    ansible-playbook -i inventory/ec2.py site.yml --extra-vars='pipeline_env=stage' --tags app
     
     
     
 # TODOs:
 
 - integration with CI to spin-up Jenkins (slaves) for automated test runs.
-
+- use sparse checkout for git source transfer to nodes
     
