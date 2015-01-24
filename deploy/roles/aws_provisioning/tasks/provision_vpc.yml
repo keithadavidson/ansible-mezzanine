@@ -57,9 +57,29 @@
 - name: Set facts for VPC
   set_fact:
     vpc_id: "{{ vpc.vpc_id }}"
-    public_subnet_id: "{{ vpc.subnets[0].id }}"
-    private_subnet_id: "{{ vpc.subnets[1].id }}"
-    private_subnet_id_a: "{{ vpc.subnets[1].id }}"
-    private_subnet_id_b: "{{ vpc.subnets[2].id }}"
+  tags:
+    - provision
+
+- name: Set facts for VPC public subnet
+  set_fact:
+    public_subnet_id: "{{ item.id }}"
+  when: item.resource_tags.tier == "{{ pipeline_env }}-web"
+  with_items: vpc.subnets
+  tags:
+    - provision
+
+- name: Set facts for VPC public subnet a
+  set_fact:
+    private_subnet_id_a: "{{ item.id }}"
+  when: item.resource_tags.tier == "{{pipeline_env}}-db"
+  with_items: vpc.subnets
+  tags:
+    - provision
+
+- name: Set facts for VPC public subnet b
+  set_fact:
+    private_subnet_id_b: "{{ item.id }}"
+  when: item.resource_tags.tier == "{{pipeline_env}}-db" and private_subnet_id_a != item.id
+  with_items: vpc.subnets
   tags:
     - provision

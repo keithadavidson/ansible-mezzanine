@@ -34,6 +34,9 @@ region: eu-west-1
 # Web teir instances
 web_instance_type: t1.micro
 webserver_count: 2
+# api teir instances
+api_instance_type: t1.micro
+apiserver_count: 2
 # DB teir instances
 db_instance_type: db.t1.micro
 dbserver_count: 1
