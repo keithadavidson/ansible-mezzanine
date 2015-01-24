@@ -23,34 +23,24 @@
 # configure for sparsecheckout as we only want the appropriate source for the node types
 
 
-- name: Deploy from project repo
-  sudo_user: "{{ install_user }}"
-  git:
-    repo: "{{ git_repo }}"
-    dest: "{{ project_path }}"
-    version: "{{ git_branch }}"
-    depth: 1
-    accept_hostkey: yes
-    ssh_opts: "-o ForwardAgent"
-  when: git_repo is defined
-  tags:
-    - api
-
-# if deploying from a local repo then don't use the git module as it requires a url.
-- name: Check if "{{ project_path }}" exists
+if deploying from without the git module...it does not allow for the depth of control you normally have with git
+- name: Check if project_path exists
   sudo_user: "{{ install_user }}"
   stat: path={{ project_path }}
   register: check_path
   tags:
     - api
+    - deploy
 
 - name: Deploy from local repo
   sudo_user: "{{ install_user }}"
   when: git_repo_local is defined and check_path.stat.exists
-  shell: git pull chdir="{{ project_path }}"
+  shell: git pull
+  args:
+    chdir: "{{ project_path }}"
   tags:
     - api
-
+    - deploy
 
 - name: Initial clone from local repo
   sudo_user: "{{ install_user }}"
@@ -60,7 +50,32 @@
     chdir: "{{ project_base }}"
   tags:
     - api
+    - deploy
 
+
+- name: Deploy from remote repo
+  sudo_user: "{{ install_user }}"
+  when: git_repo is defined and check_path.stat.exists
+  shell: git pull
+  args:
+    chdir: "{{ project_path }}"
+  tags:
+    - api
+    - deploy
+
+
+- name: Initial clone from remote repo
+  sudo_user: "{{ install_user }}"
+  when: check_path.stat.exists == false and git_repo is defined
+  shell: git clone {{ git_repo }} {{ project_path }}
+  args:
+    chdir: "{{ project_base }}"
+  tags:
+    - api
+    - deploy
+
+
+# ensure all project requirements are installed.
 
 - name: Check if environment requirements file exists
   sudo_user: "{{ install_user }}"
@@ -68,6 +83,7 @@
   register: check_path
   tags:
     - api
+    - deploy
 
 - name: Install project python package.
   sudo_user: "{{ install_user }}"
@@ -75,3 +91,4 @@
   when: check_path.stat.exists
   tags:
     - api
+    - deploy
