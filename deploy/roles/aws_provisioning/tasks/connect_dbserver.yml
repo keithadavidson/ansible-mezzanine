@@ -20,9 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
+- name: gather RDS facts
+  delegate_to: localhost
+  sudo: False
+  rds:
+    command: facts
+    region: "{{ region }}"
+    instance_name: "{{ DB_name }}"
+  register: rds_facts
+  tags:
+    - app
+    - deploy
+
 - name: set DB_server fact
-  set_fact: DB_server={{ item }}
-  with_items: groups['{{ DB_name }}']
+  set_fact: DB_server={{ rds_facts.instance.endpoint }}
   tags:
     - app
     - deploy

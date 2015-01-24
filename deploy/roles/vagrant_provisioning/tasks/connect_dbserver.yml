@@ -20,6 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+- name: set DB_server fact
+  set_fact: DB_server={{ groups['dbservers'][0] }}
+  tags:
+    - app
+    - deploy
+
 - name: create a user
   postgresql_user:
     name: "{{ DB_user }}"

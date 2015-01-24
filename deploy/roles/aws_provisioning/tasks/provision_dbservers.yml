@@ -80,16 +80,3 @@
   tags:
     - provision
 
-- name: show instance facts
-  debug: msg="{{ rds_facts }}"
-  tags:
-    - provision
-
-#- name: tag a resource
-#  ec2_tag:
-#    resource: rds_facts
-#    region: "{{ region }}"
-#    state: present
-#  args:
-#    tags: { type: "wdbservers", env: "{{pipeline_env}}", teir: "{{pipeline_env}}-db", Name: "{{pipeline_env}}-db" }
-#  tags: postgres
