@@ -23,7 +23,6 @@
 # file: dbservers.yml
 - hosts:
     - dbservers
-    - tag_type_dbservers
   sudo: yes
   pre_tasks:
   - name: update the apt cache

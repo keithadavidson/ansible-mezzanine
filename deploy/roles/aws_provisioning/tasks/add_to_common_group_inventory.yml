@@ -28,6 +28,14 @@
   tags:
     - provision
 
+# add host to group 'apiservers'
+- name: add new instances of apiservers to apiservers group
+  add_host: name={{ item.public_ip }} groups=apiservers,tag_teir_{{ pipeline_env }}-api
+  with_items: ec2vpc_api.instances
+  when: ec2vpc_web is defined
+  tags:
+    - provision
+
 # add host to group 'dbservers'
 - name: add new instances of dbservers to dbservers group
   add_host: name={{ item.public_ip }} groups=dbservers,{{DB_name}}

@@ -59,6 +59,25 @@
   tags:
     - provision
 
+- name: api security group
+  ec2_group:
+    name: "{{ pipeline_env }}-api"
+    description: "{{ pipeline_env }}-api allow http and https access"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+  register: api_secgroup
+  tags:
+    - provision
+
 - name: ssh security group
   ec2_group:
     name: "{{ pipeline_env }}-remoteaccess"

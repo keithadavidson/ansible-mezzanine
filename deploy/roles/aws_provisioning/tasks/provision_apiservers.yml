@@ -29,30 +29,30 @@
   tags:
     - provision
 
-- name: start the webserver instances
+- name: start the apiserver instances
   ec2:
     image: "{{ ubuntu_image.ami }}"
     region: "{{ region }}"
-    instance_type: "{{ web_instance_type }}"
+    instance_type: "{{ api_instance_type }}"
     key_name: "{{pipeline_env}}"
-    group: ["{{pipeline_env}}-web", "{{pipeline_env}}-remoteaccess"]
-    instance_tags: { type: "webservers", env: "{{pipeline_env}}", teir: "{{pipeline_env}}-web", Name: "{{pipeline_env}}-web" }
-    exact_count: "{{ webserver_count }}"
-    count_tag: { teir: "{{pipeline_env}}-web" }
+    group: ["{{pipeline_env}}-api", "{{pipeline_env}}-remoteaccess"]
+    instance_tags: { type: "apiservers", env: "{{pipeline_env}}", teir: "{{pipeline_env}}-api", Name: "{{pipeline_env}}-api" }
+    exact_count: "{{ apiserver_count }}"
+    count_tag: { teir: "{{pipeline_env}}-api" }
     vpc_subnet_id: "{{ public_subnet_id }}"
     assign_public_ip: yes
     wait: yes
   environment:
     EC2_INI_PATH: "library/ec2.ini"
-  register: ec2vpc_web
+  register: ec2vpc_api
   tags:
     - provision
 
-- name: add the instance to web and environment groups
+- name: add the instance to api and environment groups
   add_host:
     hostname: "{{ item.public_dns_name }}"
-    groups: "{{pipeline_env}}-web, {{pipeline_env}}"
-  with_items: ec2vpc_web.instances
+    groups: "{{pipeline_env}}-api, {{pipeline_env}}"
+  with_items: ec2vpc_api.instances
   when: item.public_dns_name is defined
   tags:
     - provision
@@ -62,7 +62,7 @@
     host: "{{ item.public_dns_name }}"
     port: 22
     search_regex: OpenSSH
-  with_items: ec2vpc_web.instances
+  with_items: ec2vpc_api.instances
   when: item.public_dns_name is defined
   tags:
     - provision

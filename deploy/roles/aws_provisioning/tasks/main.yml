@@ -23,5 +23,6 @@
 - include: provision_vpc.yml
 - include: provision_security_groups.yml
 - include: provision_webservers.yml
+- include: provision_apiservers.yml
 - include: provision_dbservers.yml
 - include: add_to_common_group_inventory.yml
