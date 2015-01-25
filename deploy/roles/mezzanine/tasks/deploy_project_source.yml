@@ -50,28 +50,18 @@ if deploying from without the git module...it does not allow for the depth of co
     - app
     - deploy
 
-
 - name: Deploy from remote repo
   sudo_user: "{{ install_user }}"
-  when: git_repo is defined and check_path.stat.exists
-  shell: git pull
-  args:
-    chdir: "{{ project_path }}"
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ project_path }}"
+    version: "{{ git_branch }}"
+    depth: 1
+    accept_hostkey: True
+  when: git_repo is defined
   tags:
     - app
     - deploy
-
-
-- name: Initial clone from remote repo
-  sudo_user: "{{ install_user }}"
-  when: check_path.stat.exists == false and git_repo is defined
-  shell: git clone {{ git_repo }} {{ project_path }}
-  args:
-    chdir: "{{ project_base }}"
-  tags:
-    - app
-    - deploy
-
 
 # ensure all project requirements are installed.
 - name: Check if environment requirements file exists
