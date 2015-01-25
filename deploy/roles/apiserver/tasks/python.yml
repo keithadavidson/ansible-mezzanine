@@ -28,7 +28,9 @@
     - python-software-properties
     - libpq-dev
     - python-pip
-  tags: api
+  tags:
+    - api
+    - deploy
 
 - name: Add WORKON_HOME=$HOME/.virtualenvs to .bashrc
   lineinfile: >
@@ -37,7 +39,9 @@
     regexp='^export WORKON_HOME\=\$HOME\/\.virtualenvs'
     line='export WORKON_HOME=$HOME/.virtualenvs'
     insertafter=EOF
-  tags: api
+  tags:
+    - api
+    - deploy
 
 - name: Add PROJECT_HOME=$HOME/{{ project_name }} to .bashrc
   lineinfile: >
@@ -46,7 +50,9 @@
     regexp='^export PROJECT_HOME\=\$HOME\/{{ project_name }}'
     line='export PROJECT_HOME=$HOME/{{ project_name }}'
     insertafter=EOF
-  tags: api
+  tags:
+    - api
+    - deploy
 
 - name: Add source /usr/local/bin/virtualenvwrapper.sh to .bashrc
   lineinfile: >
@@ -55,18 +61,17 @@
     regexp='^source \/usr\/local\/bin\/virtualenvwrapper\.sh'
     line='source /usr/local/bin/virtualenvwrapper.sh'
     insertafter=EOF
-  tags: api
+  tags:
+    - api
+    - deploy
 
 - name: Install (Virtualenv & VirtualenvWrapper) python package.
   pip: name={{ item }}
   with_items:
     - virtualenv
     - virtualenvwrapper
-  tags: api
+  tags:
+    - api
+    - deploy
 
-#- name: Create virtualenv
-#  shell: . /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv {{ api_project_name }} --distribute
-#  args:
-#    executable: /bin/bash
-#  tags: api
 

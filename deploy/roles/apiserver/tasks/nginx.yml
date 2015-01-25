@@ -26,15 +26,18 @@
     dest: "/etc/nginx/sites-available/{{ project_name }}-api.conf"
   notify:
     - restart nginx
-  tags: api
-
+  tags:
+    - api
+    - deploy
 - name: create nginx site log directory
   file:
     dest: "/var/log/nginx/{{ project_name }}-api"
     state: directory
   notify:
     - restart nginx
-  tags: api
+  tags:
+    - api
+    - deploy
 
 - name: remove nginx default site from sites_enabled
   file:
@@ -42,8 +45,9 @@
     state: absent
   notify:
     - restart nginx
-  tags: api
-
+  tags:
+    - api
+    - deploy
 
 - name: enable configuration
   file:
@@ -52,16 +56,18 @@
     state: link
   notify:
     - restart nginx
-  tags: api
-
+  tags:
+    - api
+    - deploy
 # Setup SSL certificates
 - name: ensure config path exists
   file:
     path: "{{ nginx_conf_path }}"
     state: directory
   when: ssl_enabled
-  tags: api
-
+  tags:
+    - api
+    - deploy
 - name: create ssl certificates
   command: >
     openssl req -new -x509 -nodes -out {{ project_name }}.crt
@@ -71,8 +77,9 @@
   sudo: True
   when: ssl_enabled and pipeline_env!="prod"
   notify: restart nginx
-  tags: api
-
+  tags:
+    - api
+    - deploy
 - name: copy ssl key
   copy:
     src: "certs/{{project_name}}.key"
@@ -82,8 +89,9 @@
   sudo: True
   when: ssl_enabled and pipeline_env=="prod"
   notify: restart nginx
-  tags: api
-
+  tags:
+    - api
+    - deploy
 - name: copy ssl certificate
   copy:
     src: "certs/{{project_name}}.crt"
@@ -91,4 +99,6 @@
   sudo: True
   when: ssl_enabled and pipeline_env=="prod"
   notify: restart nginx
-  tags: api
+  tags:
+    - api
+    - deploy

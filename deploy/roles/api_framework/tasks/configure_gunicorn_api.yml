@@ -26,4 +26,5 @@
   notify: restart supervisor
   tags:
     - api
+    - deploy
 

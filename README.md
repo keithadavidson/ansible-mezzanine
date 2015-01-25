@@ -152,10 +152,15 @@ Staging environment, deploy the Mezzanine application:
 
     ansible-playbook -i inventory/ec2.py site.yml --extra-vars='pipeline_env=stage' --tags app
     
-    
-    
+
+To deploy both the Mezzanine and API applications use the `--tags deploy`, this is equivalent to `app,api`
+
+    ansible-playbook -i inventory/ec2.py site.yml --extra-vars='pipeline_env=stage' --tags app
+
+        
 # TODOs:
 
 - integration with CI to spin-up Jenkins (slaves) for automated test runs.
 - use sparse checkout for git source transfer to nodes
+- add backup and restore for DB deployments
     

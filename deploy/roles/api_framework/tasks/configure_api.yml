@@ -26,6 +26,7 @@
   notify: restart supervisor
   tags:
     - api
+    - deploy
 
 - name: sync the database and apply migrations
   sudo_user: "{{ install_user }}"
@@ -39,3 +40,4 @@
     - migrate
   tags:
     - api
+    - deploy

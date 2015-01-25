@@ -35,4 +35,5 @@
     - python-memcached
   tags:
     - api
+    - deploy
 

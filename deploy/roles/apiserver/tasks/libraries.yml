@@ -36,4 +36,6 @@
     - supervisor
     - git
     - nginx
-  tags: libraries
+  tags:
+    - api
+    - deploy
