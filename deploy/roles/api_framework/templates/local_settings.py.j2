@@ -19,7 +19,7 @@ DATABASES = {
         # Not used with sqlite3.
         "PASSWORD": "{{ DB_password }}",
         # Set to empty string for localhost. Not used with sqlite3.
-        "HOST": "{{groups['dbservers'][0]}}",
+        "HOST": "{{DB_server}}",
         # Set to empty string for default. Not used with sqlite3.
         "PORT": "{{ DB_port }}",
     }
