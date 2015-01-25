@@ -29,6 +29,6 @@ api_git_branch: master
 
 # Domain variables
 zone: public.com
-domains:
+api_domains:
     - api.stage.public.com
 
